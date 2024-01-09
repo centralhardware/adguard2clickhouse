@@ -7,6 +7,8 @@ COPY requirements.txt .
 RUN apk add build-base && \
     pip install -r requirements.txt
 
+ENV HOME /code
+
 COPY src/ .
 
 CMD [ "python", "./collector.py" ]
