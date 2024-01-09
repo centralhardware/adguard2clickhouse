@@ -30,9 +30,11 @@ def follow(file, sleep_sec=0.1) -> Iterator[str]:
             time.sleep(sleep_sec)
 
 if __name__ == '__main__':
+    print("starting")
+    open("/code/querylog.log", 'w').close()
     with open("/code/querylog.log", 'r') as file:
         for line in follow(file):
-            print(line, end='')
+            date_time = parser.isoparse(j['T'])
             j = json5.loads(line)
             try:
                 isFiltered = j['Result']['IsFiltered']
@@ -49,6 +51,6 @@ if __name__ == '__main__':
             except KeyError:
                 cached = False
 
-            data = [[parser.isoparse(j['T']), j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached]]
+            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached]]
             clickhouse.insert('log', data,
                               ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached'])
