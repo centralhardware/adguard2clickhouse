@@ -34,8 +34,9 @@ if __name__ == '__main__':
     open("/code/querylog.log", 'w').close()
     with open("/code/querylog.log", 'r') as file:
         for line in follow(file):
-            date_time = parser.isoparse(j['T'])
             j = json5.loads(line)
+
+            date_time = parser.isoparse(j['T'])
             try:
                 isFiltered = j['Result']['IsFiltered']
             except KeyError:
