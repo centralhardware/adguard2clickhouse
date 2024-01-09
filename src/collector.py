@@ -35,7 +35,7 @@ def follow(file, sleep_sec=0.1) -> Iterator[str]:
             time.sleep(sleep_sec)
 
 if __name__ == '__main__':
-    with open("../querylog.log", 'r') as file:
+    with open("/code/querylog.log", 'r') as file:
         for line in follow(file):
             print(line, end='')
             j = json5.loads(line)
