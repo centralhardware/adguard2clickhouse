@@ -15,11 +15,6 @@ database = os.getenv("DB_DATABASE")
 clickhouse = clickhouse_connect.get_client(host=host, database=database, port=8123, username=user, password=password)
 tail_file = os.getenv("TAIL_FILE")
 
-f = subprocess.Popen(['tail','-F',tail_file],\
-        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-p = select.poll()
-p.register(f.stdout)
-
 def follow(file, sleep_sec=0.1) -> Iterator[str]:
     """ Yield each line from a file as they are written.
     `sleep_sec` is the time to sleep after empty reads. """
