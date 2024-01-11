@@ -62,5 +62,6 @@ if __name__ == '__main__':
                     rdatas.append(str(pr.rdata))
 
             data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, t.header.rcode, rdatas]]
+            print(data)
             clickhouse.insert(table, data,
                               ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rcode', 'rdatas'])
