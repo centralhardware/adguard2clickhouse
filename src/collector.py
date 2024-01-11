@@ -58,7 +58,7 @@ if __name__ == '__main__':
             t = DNSRecord.parse(base64.b64decode(j['Answer']))
             rdata = t.a.rdata
             if rdata is None or not valid_ipv4(str(rdata)):
-                rdata = None
+                rdata = '0.0.0.0'
 
             data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, str(rdata), t.header.rcode]]
             clickhouse.insert(table, data,
