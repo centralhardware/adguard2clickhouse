@@ -63,6 +63,7 @@ if __name__ == '__main__':
                 rdata = '0.0.0.0'
                 rcode = 0
 
-            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, ipaddress.ip_address(rdata), rcode]]
+            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, rdata, rcode]]
+            print(data)
             clickhouse.insert(table, data,
                               ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rdata', 'rcode'])
