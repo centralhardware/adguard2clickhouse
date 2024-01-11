@@ -1,6 +1,4 @@
 import os
-import select
-import subprocess
 import time
 from typing import Iterator
 
@@ -13,7 +11,8 @@ password = os.getenv("DB_PASSWORD")
 host = os.getenv("DB_HOST")
 database = os.getenv("DB_DATABASE")
 clickhouse = clickhouse_connect.get_client(host=host, database=database, port=8123, username=user, password=password)
-tail_file = os.getenv("TAIL_FILE")
+table = os.getenv("TABLE")
+
 
 def follow(file, sleep_sec=0.1) -> Iterator[str]:
     """ Yield each line from a file as they are written.
@@ -28,6 +27,7 @@ def follow(file, sleep_sec=0.1) -> Iterator[str]:
                 line = ''
         elif sleep_sec:
             time.sleep(sleep_sec)
+
 
 if __name__ == '__main__':
     print("starting")
@@ -53,5 +53,5 @@ if __name__ == '__main__':
                 cached = False
 
             data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached]]
-            clickhouse.insert('log', data,
+            clickhouse.insert(table, data,
                               ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached'])
