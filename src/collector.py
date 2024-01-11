@@ -54,7 +54,14 @@ if __name__ == '__main__':
             except KeyError:
                 cached = False
 
-            t = DNSRecord.parse(base64.b64decode(j['Answer']))
-            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['IP'], isFiltered, j['Elapsed'], cached, t.a.rdata, t.header.rcode]]
+            try:
+                t = DNSRecord.parse(base64.b64decode(j['Answer']))
+                rdata = t.a.rdata
+                rcode = t.header.rcode
+            except AttributeError:
+                rdata = '0.0.0.0'
+                rcode = 0
+
+            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, t.a.rdata, t.header.rcode]]
             clickhouse.insert(table, data,
-                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rdata', 'rcode'])
+                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rdata', 'rcode'])
