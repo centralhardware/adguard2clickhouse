@@ -1,3 +1,4 @@
+import base64
 import os
 import time
 from typing import Iterator
@@ -5,6 +6,7 @@ from typing import Iterator
 import clickhouse_connect
 import json5
 from dateutil import parser
+from dnslib import DNSRecord
 
 user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
@@ -52,6 +54,7 @@ if __name__ == '__main__':
             except KeyError:
                 cached = False
 
-            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached]]
+            t = DNSRecord.parse(base64.b64decode(j['Answer']))
+            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['IP'], isFiltered, j['Elapsed'], cached, t.a.rdata, t.header.rcode]]
             clickhouse.insert(table, data,
-                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached'])
+                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rdata', 'rcode'])
