@@ -1,5 +1,5 @@
 import base64
-from netaddr import valid_ipv4
+from netaddr import valid_ipv4, valid_ipv6
 import os
 import time
 from typing import Iterator
@@ -57,10 +57,16 @@ if __name__ == '__main__':
 
             t = DNSRecord.parse(base64.b64decode(j['Answer']))
             rdatas = []
+            rdatas6 = []
+            cnames = []
             for pr in t.rr:
                 if pr.rdata is not None and valid_ipv4(str(pr.rdata)):
                     rdatas.append(str(pr.rdata))
+                elif pr.rdata is not None and valid_ipv6(str(pr.rdata)):
+                    rdatas6.append(str(pr.rdata))
+                elif pr.rdata is not None:
+                    cnames.append(str(pr.rdata))
 
-            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, t.header.rcode, rdatas]]
+            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, t.header.rcode, rdatas, rdatas6, cnames]]
             clickhouse.insert(table, data,
-                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rcode', 'rdatas'])
+                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
