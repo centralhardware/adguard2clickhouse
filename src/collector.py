@@ -7,7 +7,7 @@ from typing import Iterator
 import clickhouse_connect
 import json5
 from dateutil import parser
-from dnslib import DNSRecord
+from dnslib import DNSRecord, A
 
 user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
@@ -60,8 +60,6 @@ if __name__ == '__main__':
             if rdata is None or not valid_ipv4(str(rdata)):
                 rdata = '0.0.0.0'
 
-            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, rdata, t.header.rcode]]
-            print(data)
-            print(rdata)
+            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, A(rdata), t.header.rcode]]
             clickhouse.insert(table, data,
                               ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rdata', 'rcode'])
