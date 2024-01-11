@@ -1,5 +1,5 @@
 import base64
-import ipaddress
+from netaddr import valid_ipv4
 import os
 import time
 from typing import Iterator
@@ -58,7 +58,7 @@ if __name__ == '__main__':
             t = DNSRecord.parse(base64.b64decode(j['Answer']))
 
             rdata = t.a.rdata
-            if rdata is None:
+            if rdata is None or not valid_ipv4(rdata):
                 rdata = '0.0.0.0'
 
             data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, rdata, t.header.rcode]]

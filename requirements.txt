@@ -2,3 +2,4 @@ clickhouse_connect~=0.6.23
 json5~=0.9.14
 python-dateutil~=2.8.2
 dnslib~=0.9.24
+netaddr~=0.10.1
