@@ -58,7 +58,7 @@ if __name__ == '__main__':
             t = DNSRecord.parse(base64.b64decode(j['Answer']))
             rdatas = []
             for pr in t.rr:
-                if pr.rdata is None or not valid_ipv4(str(pr.rdata)):
+                if pr.rdata is not None and valid_ipv4(str(pr.rdata)):
                     rdatas.append(str(pr.rdata))
 
             data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, t.header.rcode, rdatas]]
