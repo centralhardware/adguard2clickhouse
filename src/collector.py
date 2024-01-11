@@ -62,5 +62,6 @@ if __name__ == '__main__':
 
             data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, rdata, t.header.rcode]]
             print(data)
+            print(rdata)
             clickhouse.insert(table, data,
                               ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rdata', 'rcode'])
