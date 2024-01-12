@@ -4,10 +4,10 @@ import os
 
 import clickhouse_connect
 import json5
+import tailer
 from dateutil import parser
 from dnslib import DNSRecord
 from netaddr import valid_ipv4, valid_ipv6
-from pygtail import Pygtail
 
 user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(message)s')
     logging.info('start application')
 
-    for line in Pygtail("/code/querylog.log"):
+    for line in tailer.follow(open("/code/querylog.log")):
         j = json5.loads(line)
 
         date_time = parser.isoparse(j['T'])
