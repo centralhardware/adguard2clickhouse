@@ -1,13 +1,13 @@
 import base64
-from netaddr import valid_ipv4, valid_ipv6
+import logging
 import os
-import time
-from typing import Iterator
 
 import clickhouse_connect
 import json5
 from dateutil import parser
-from dnslib import DNSRecord, A
+from dnslib import DNSRecord
+from netaddr import valid_ipv4, valid_ipv6
+from pygtail import Pygtail
 
 user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
@@ -16,57 +16,45 @@ database = os.getenv("DB_DATABASE")
 clickhouse = clickhouse_connect.get_client(host=host, database=database, port=8123, username=user, password=password)
 table = os.getenv("TABLE")
 
-
-def follow(file, sleep_sec=0.1) -> Iterator[str]:
-    """ Yield each line from a file as they are written.
-    `sleep_sec` is the time to sleep after empty reads. """
-    line = ''
-    while True:
-        tmp = file.readline()
-        if tmp is not None and tmp != "":
-            line += tmp
-            if line.endswith("\n"):
-                yield line
-                line = ''
-        elif sleep_sec:
-            time.sleep(sleep_sec)
-
-
 if __name__ == '__main__':
-    print("starting")
     open("/code/querylog.log", 'w').close()
-    with open("/code/querylog.log", 'r') as file:
-        for line in follow(file):
-            j = json5.loads(line)
+    logging.basicConfig(level=logging.INFO, format='%(message)s')
+    logging.info('start application')
 
-            date_time = parser.isoparse(j['T'])
-            try:
-                isFiltered = j['Result']['IsFiltered']
-            except KeyError:
-                isFiltered = False
+    for line in Pygtail("/code/querylog.log"):
+        j = json5.loads(line)
 
-            try:
-                upstream = j['Upstream']
-            except KeyError:
-                upstream = ''
+        date_time = parser.isoparse(j['T'])
+        try:
+            isFiltered = j['Result']['IsFiltered']
+        except KeyError:
+            isFiltered = False
 
-            try:
-                cached = j['Cached']
-            except KeyError:
-                cached = False
+        try:
+            upstream = j['Upstream']
+        except KeyError:
+            upstream = ''
 
-            t = DNSRecord.parse(base64.b64decode(j['Answer']))
-            rdatas = []
-            rdatas6 = []
-            cnames = []
-            for pr in t.rr:
-                if pr.rdata is not None and valid_ipv4(str(pr.rdata)):
-                    rdatas.append(str(pr.rdata))
-                elif pr.rdata is not None and valid_ipv6(str(pr.rdata)):
-                    rdatas6.append(str(pr.rdata))
-                elif pr.rdata is not None:
-                    cnames.append(str(pr.rdata))
+        try:
+            cached = j['Cached']
+        except KeyError:
+            cached = False
 
-            data = [[date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream,j['Answer'], j['IP'], isFiltered, j['Elapsed'], cached, t.header.rcode, rdatas, rdatas6, cnames]]
-            clickhouse.insert(table, data,
-                              ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered','Elapsed', 'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
+        t = DNSRecord.parse(base64.b64decode(j['Answer']))
+        rdatas = []
+        rdatas6 = []
+        cnames = []
+        for pr in t.rr:
+            if pr.rdata is not None and valid_ipv4(str(pr.rdata)):
+                rdatas.append(str(pr.rdata))
+            elif pr.rdata is not None and valid_ipv6(str(pr.rdata)):
+                rdatas6.append(str(pr.rdata))
+            elif pr.rdata is not None:
+                cnames.append(str(pr.rdata))
+
+        data = [
+            [date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'],
+             cached, t.header.rcode, rdatas, rdatas6, cnames]]
+        clickhouse.insert(table, data,
+                          ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered', 'Elapsed',
+                           'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
