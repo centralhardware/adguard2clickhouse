@@ -13,7 +13,7 @@ user = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
 host = os.getenv("DB_HOST")
 database = os.getenv("DB_DATABASE")
-clickhouse = clickhouse_connect.get_client(host=host, database=database, port=8123, username=user, password=password)
+clickhouse = clickhouse_connect.get_client(host=host, database=database, port=8123, username=user, password=password, settings={'async_insert', '1', 'wait_for_async_insert', '0'})
 table = os.getenv("TABLE")
 
 if __name__ == '__main__':
