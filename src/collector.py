@@ -40,7 +40,7 @@ def process_line(line):
     blockedBy = []
     try:
         for result in j['Result']:
-            blockedBy.append(result['FilterListID'])
+            blockedBy.append(int(result['FilterListID']))
     except KeyError:
         blockedBy = None
 
