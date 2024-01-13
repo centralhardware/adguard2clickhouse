@@ -38,13 +38,6 @@ def process_line(line):
     except KeyError:
         cached = False
 
-    blockedBy = []
-    try:
-        for result in j['Result']:
-            blockedBy.append(int(result['FilterListID']))
-    except KeyError:
-        blockedBy = None
-
     t = DNSRecord.parse(base64.b64decode(j['Answer']))
     rdatas = []
     rdatas6 = []
@@ -59,10 +52,10 @@ def process_line(line):
 
     data = [
         [date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'],
-         cached, t.header.rcode, rdatas, rdatas6, cnames, blockedBy]]
+         cached, t.header.rcode, rdatas, rdatas6, cnames]]
     clickhouse.insert(table, data,
                       ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered', 'Elapsed',
-                       'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames', 'blockedBy2'])
+                       'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
 
 
 if __name__ == '__main__':
@@ -71,7 +64,4 @@ if __name__ == '__main__':
     logging.info('start application')
 
     for line in tailer.follow(open("/code/querylog.log")):
-        try:
-            process_line(line)
-        except Exception as e:
-            traceback.print_exc()
+        process_line(line)
