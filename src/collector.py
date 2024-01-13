@@ -37,6 +37,12 @@ def process_line(line):
     except KeyError:
         cached = False
 
+    try:
+        blockedBy = j['Result']['FilterListID']
+    except KeyError:
+        blockedBy = None
+
+
     t = DNSRecord.parse(base64.b64decode(j['Answer']))
     rdatas = []
     rdatas6 = []
@@ -51,10 +57,10 @@ def process_line(line):
 
     data = [
         [date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'],
-         cached, t.header.rcode, rdatas, rdatas6, cnames]]
+         cached, t.header.rcode, rdatas, rdatas6, cnames, blockedBy]]
     clickhouse.insert(table, data,
                       ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered', 'Elapsed',
-                       'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
+                       'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames', 'blockedBy'])
 
 
 if __name__ == '__main__':
