@@ -1,6 +1,7 @@
 import base64
 import logging
 import os
+import traceback
 
 import clickhouse_connect
 import json5
@@ -73,4 +74,4 @@ if __name__ == '__main__':
         try:
             process_line(line)
         except Exception as e:
-            logging.error(e)
+            traceback.print_exc()
