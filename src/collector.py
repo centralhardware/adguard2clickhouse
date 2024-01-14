@@ -64,4 +64,8 @@ if __name__ == '__main__':
     logging.info('start application')
 
     for line in tailer.follow(open("/code/querylog.log")):
-        process_line(line)
+        try:
+            process_line(line)
+        except Exception:
+            traceback.print_exc()
+            print(line)
