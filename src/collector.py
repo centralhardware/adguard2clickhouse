@@ -56,8 +56,6 @@ def process_line(line):
     clickhouse.insert('log2', data,
                       ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered', 'Elapsed',
                        'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
-    data = [[date_time, json.dumps(t)]]
-    clickhouse.insert('answer', data, ['date_time', 'answer'])
 
 
 if __name__ == '__main__':
