@@ -16,8 +16,6 @@ host = os.getenv("DB_HOST")
 database = os.getenv("DB_DATABASE")
 clickhouse = clickhouse_connect.get_client(host=host, database=database, port=8123, username=user, password=password,
                                            settings={'async_insert': '1', 'wait_for_async_insert': '0'})
-table = os.getenv("TABLE")
-
 
 def process_line(line):
     j = json5.loads(line)
@@ -51,11 +49,13 @@ def process_line(line):
             cnames.append(str(pr.rdata))
 
     data = [
-        [date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['Answer'], j['IP'], isFiltered, j['Elapsed'],
+        [date_time, j['QH'], j['QT'], j['QC'], j['CP'], upstream, j['IP'], isFiltered, j['Elapsed'],
          cached, t.header.rcode, rdatas, rdatas6, cnames]]
-    clickhouse.insert(table, data,
-                      ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'Answer', 'IP', 'IsFiltered', 'Elapsed',
+    clickhouse.insert('log2', data,
+                      ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered', 'Elapsed',
                        'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
+    data = [[date_time, json5.dumps(j['Answer'])]]
+    clickhouse.insert('answer', data, ['date_time', 'answer'])
 
 
 if __name__ == '__main__':
