@@ -54,7 +54,7 @@ def process_line(line):
     clickhouse.insert('log2', data,
                       ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered', 'Elapsed',
                        'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
-    data = [[date_time, json5.dumps(j['Answer'])]]
+    data = [[date_time, json5.dumps(t)]]
     clickhouse.insert('answer', data, ['date_time', 'answer'])
 
 
