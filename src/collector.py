@@ -1,4 +1,5 @@
 import base64
+import json
 import logging
 import os
 import traceback
@@ -55,7 +56,7 @@ def process_line(line):
     clickhouse.insert('log2', data,
                       ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered', 'Elapsed',
                        'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
-    data = [[date_time, jsonpickle.encode(t)]]
+    data = [[date_time, json.dumps(t)]]
     clickhouse.insert('answer', data, ['date_time', 'answer'])
 
 
