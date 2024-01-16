@@ -5,6 +5,7 @@ import traceback
 
 import clickhouse_connect
 import json5
+import jsonpickle
 import tailer
 from dateutil import parser
 from dnslib import DNSRecord
@@ -54,7 +55,7 @@ def process_line(line):
     clickhouse.insert('log2', data,
                       ['date_time', 'QH', 'QT', 'QC', 'CP', 'Upstream', 'IP', 'IsFiltered', 'Elapsed',
                        'Cached', 'rcode', 'rdatas', 'rdatas6', 'cnames'])
-    data = [[date_time, json5.dumps(t)]]
+    data = [[date_time, jsonpickle.encode(t)]]
     clickhouse.insert('answer', data, ['date_time', 'answer'])
 
 
