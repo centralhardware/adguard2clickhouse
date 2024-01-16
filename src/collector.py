@@ -1,12 +1,10 @@
 import base64
-import json
 import logging
 import os
 import traceback
 
 import clickhouse_connect
 import json5
-import jsonpickle
 import tailer
 from dateutil import parser
 from dnslib import DNSRecord
