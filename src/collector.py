@@ -83,7 +83,7 @@ def get_config():
     password = os.getenv("DB_PASSWORD")
     host = os.getenv("DB_HOST")
     database = os.getenv("DB_DATABASE")
-    return {"user": user, "password": password, "host": host, "database": database}
+    return {"username": user, "password": password, "host": host, "database": database}
 
 
 if __name__ == "__main__":
