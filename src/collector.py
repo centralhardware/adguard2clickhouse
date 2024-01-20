@@ -5,6 +5,7 @@ import os
 import traceback
 
 import clickhouse_connect
+from dateutil import parser
 import tailer
 from dnslib import DNSRecord
 from netaddr import valid_ipv4, valid_ipv6
@@ -13,7 +14,7 @@ from netaddr import valid_ipv4, valid_ipv6
 class DNSQuery:
     def __init__(self, dns_query):
         self.log = json.loads(dns_query)
-        self.date_time = self.log['T']
+        self.date_time = parser.isoparse(self.log['T'])
         self.query_address = self.log['QH']
         self.query_type = self.log['QT']
         self.query_class = self.log['QC']
